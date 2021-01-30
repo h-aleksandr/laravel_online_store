@@ -15,6 +15,8 @@
 <link rel="stylesheet" type="text/css" href="/styles/responsive.css">
 <link rel="stylesheet" type="text/css" href="/styles/product.css">
 <link rel="stylesheet" type="text/css" href="/styles/product_responsive.css">
+	<!-- CSRF Token -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
   @yield('custom_css')
 </head>
 <body>
@@ -219,6 +221,7 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 <script src="/plugins/Isotope/isotope.pkgd.min.js"></script>
 <script src="/plugins/easing/easing.js"></script>
 <script src="/plugins/parallax-js-master/parallax.min.js"></script>
+<script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
 <script src="/js/custom.js"></script>
 <script src="/js/product.js"></script>
 @yield('custom_js')

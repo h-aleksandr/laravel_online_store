@@ -7,10 +7,6 @@
 	<link rel="stylesheet" type="text/css" href="/styles/categories_responsive.css">
 @endsection
 
-@section ('custom_js')
-	<script src="/js/categories.js"></script>
-@endsection
-
 
 @section('content')
 
@@ -49,9 +45,9 @@
 										<span class="sorting_text">Sort by</span>
 										<i class="fa fa-chevron-down" aria-hidden="true"></i>
 										<ul>
-											<li class="product_sorting_btn" data-order="prise-default" data-isotope-option='{ "sortBy": "original-order" }'><span>Default</span></li>
-											<li class="product_sorting_btn" data-order="prise-low-high" data-isotope-option='{ "sortBy": "price" }'><span>Price: Low-High</span></li>
-											<li class="product_sorting_btn" data-order="prise-high-low" data-isotope-option='{ "sortBy": "price" }'><span>Price: High-Low</span></li>
+											<li class="product_sorting_btn" data-order="default" data-isotope-option='{ "sortBy": "original-order" }'><span>Default</span></li>
+											<li class="product_sorting_btn" data-order="price-low-high" data-isotope-option='{ "sortBy": "price" }'><span>Price: Low-High</span></li>
+											<li class="product_sorting_btn" data-order="price-high-low" data-isotope-option='{ "sortBy": "price" }'><span>Price: High-Low</span></li>
 											<li class="product_sorting_btn" data-order="name-a-z" data-isotope-option='{ "sortBy": "stars" }'><span>Name: A-Z</span></li>
 											<li class="product_sorting_btn" data-order="name-z-a" data-isotope-option='{ "sortBy": "stars" }'><span>Name: Z-A</span></li>
 										</ul>
@@ -68,7 +64,7 @@
 					<div class="product_grid">
 
 						<!-- Product -->
-						@foreach($cat->products as $product)
+						@foreach($products as $product)
 
 							<!-- Product -->
 
@@ -180,12 +176,59 @@
 	</div>
 @endsection
 
-@section('custom_js')
+@section ('custom_js')
+	<script src="/js/categories.js"></script>
 	<script>
 		$(document).ready(function (){
 			$('.product_sorting_btn').click(function() {
 				let orderBy = $(this).data('order')
-				console.log(orderBy);
+				$('.sorting_text').text($(this).find('span').text())
+
+				$.ajax({
+
+					url:"{{route('showCategory', $cat->alias)}}",
+					type:"GET",
+					data:{
+						orderBy: orderBy
+					},
+					
+					headers: {
+        					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    					},
+
+    					success: (data) => {
+    						/*
+    						//добавление в адресную строку параметра orderBy и значения для него:
+
+    						let positionParameres + location.pathname.indexOf('?');	// определяем позицию знака вопроса, после которого идут get-параметры
+    						let url = location.pathname.substring(positionParameres, location.pathname.length);
+    						let newUrl = url + '?';		// на этом этапе: http://127.0.0.1:8000/phones?
+    						newUrl += 'orderBy=' + orderBy;	//на этом этапе: http://127.0.0.1:8000/phones?orderBy=name-a-z
+    						history.pushState({}, '', newUrl);		//меняем на новый url	
+    						*/
+
+    					let positionParameters = location.pathname.indexOf('?');	// определяем позицию знака вопроса, после которого идут get-параметры
+                        let url = location.pathname.substring(positionParameters,location.pathname.length);
+                        let newURL = url + '?'; // http://127.0.0.1:8001/phones?
+                        newURL += 'orderBy=' + orderBy; // http://127.0.0.1:8001/phones?orderBy=name-z-a		//"&page={{isset($_GET['page']) ? $_GET['page'] : 1}}"+'orderBy=' + orderBy
+                        history.pushState({}, '', newURL);	////меняем на новый url
+
+    						$('.product-grid').html(data)
+
+    						$('.product-grid').isotope('destroy')
+    						$('.product-grid').imagesLoaded( function(){
+    							var grid = $('.product-grid').isotope({
+    								itemSelector: '.product',
+    								layoutMode: 'fitRows',
+    								fitRows:
+    								{
+    									gutter: 30
+    								}
+    							})
+    						})
+					}
+					
+				})
 			})
 		})
 	</script>
